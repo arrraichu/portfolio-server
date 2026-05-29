@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -45,10 +44,6 @@ func postContent(ctx *gin.Context) {
 }
 
 func main() {
-	fmt.Println(os.Getenv("DBHOST"))
-	fmt.Println(os.Getenv("DBUSER"))
-	fmt.Println(os.Getenv("DBPASS"))
-
 	cfg := pq.Config{
 		Host:           os.Getenv("DBHOST"),
 		Port:           5432,
