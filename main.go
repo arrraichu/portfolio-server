@@ -18,7 +18,7 @@ var db *sql.DB
 func getContentTypes(ctx *gin.Context) {
 	var contentTypes []content.ContentType
 
-	rows, err := db.Query("SELECT * FROM content_type")
+	rows, err := db.Query("SELECT code, label, reqs FROM content_type")
 	if err != nil {
 		panic(err) // todo: FIX ME
 	}
@@ -26,7 +26,7 @@ func getContentTypes(ctx *gin.Context) {
 
 	for rows.Next() {
 		var c content.ContentType
-		if err := rows.Scan(&c.Code, &c.Label); err != nil {
+		if err := rows.Scan(&c.Code, &c.Label, &c.Reqs); err != nil {
 			panic(err) // todo: FIX ME
 		}
 		contentTypes = append(contentTypes, c)
