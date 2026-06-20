@@ -2,11 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	dbPosts "arrraichu/portfolio-server/db"
 	content "arrraichu/portfolio-server/internal"
 
 	"github.com/gin-gonic/gin"
@@ -40,7 +42,27 @@ func getAllContent(ctx *gin.Context) {
 }
 
 func postContent(ctx *gin.Context) {
+	var err error
 
+	var input content.Content
+	if err = ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": err.Error()})
+		return
+	}
+
+	switch input.Type {
+	case "text":
+		err = dbPosts.PostTextContent(db, input)
+	default:
+		err = fmt.Errorf("Unknown content type: %s", input.Type)
+	}
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"ok": true, "error": nil})
 }
 
 func main() {
