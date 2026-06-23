@@ -1,44 +1,61 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"time"
 
-	dbPosts "arrraichu/portfolio-server/db"
+	contentDb "arrraichu/portfolio-server/db"
 	content "arrraichu/portfolio-server/internal"
 
+	_ "github.com/lib/pq"
+
 	"github.com/gin-gonic/gin"
-	"github.com/lib/pq"
+	"github.com/jmoiron/sqlx"
 )
 
-var db *sql.DB
+var db *sqlx.DB
 
 func getContentTypes(ctx *gin.Context) {
-	var contentTypes []content.ContentType
-
-	rows, err := db.Query("SELECT code, label, reqs FROM content_type")
+	types, err := contentDb.FetchContentTypes(db)
 	if err != nil {
-		panic(err) // todo: FIX ME
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var c content.ContentType
-		if err := rows.Scan(&c.Code, &c.Label, &c.Reqs); err != nil {
-			panic(err) // todo: FIX ME
-		}
-		contentTypes = append(contentTypes, c)
+		log.Printf("!! ERROR !! %s\n", err.Error())
+		ctx.JSON(
+			http.StatusInternalServerError,
+			gin.H{"ok": false, "error": err.Error()},
+		)
+		return
 	}
 
-	ctx.IndentedJSON(http.StatusOK, contentTypes)
+	ctx.JSON(
+		http.StatusOK,
+		types,
+	)
 }
 
 func getAllContent(ctx *gin.Context) {
+	path := ctx.Query("page_path")
+	if path == "" {
+		err := fmt.Errorf("Request must contain a page_path query parameter.")
+		ctx.JSON(
+			http.StatusBadRequest,
+			gin.H{"ok": false, "error": err.Error()},
+		)
+		return
+	}
 
+	posts, err := contentDb.FetchContent(db, path)
+	if err != nil {
+		log.Printf("!! ERROR !! %s\n", err.Error())
+		ctx.JSON(
+			http.StatusInternalServerError,
+			gin.H{"ok": false, "error": err.Error()},
+		)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"ok": true, "error": nil, "posts": posts})
 }
 
 func postContent(ctx *gin.Context) {
@@ -52,7 +69,7 @@ func postContent(ctx *gin.Context) {
 
 	switch input.Type {
 	case "text":
-		err = dbPosts.PostTextContent(db, input)
+		err = contentDb.PostTextContent(db, input)
 	default:
 		err = fmt.Errorf("Unknown content type: %s", input.Type)
 	}
@@ -62,24 +79,26 @@ func postContent(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"ok": true, "error": nil})
+	ctx.JSON(
+		http.StatusOK,
+		gin.H{"ok": true, "error": nil},
+	)
 }
 
 func main() {
-	cfg := pq.Config{
-		Host:           os.Getenv("DBHOST"),
-		Port:           5432,
-		User:           os.Getenv("DBUSER"),
-		Password:       os.Getenv("DBPASS"),
-		Database:       os.Getenv("DBNAME"),
-		ConnectTimeout: 5 * time.Second,
-		SSLMode:        pq.SSLMode("prefer"),
-	}
-	c, err := pq.NewConnectorConfig(cfg)
+	var err error
+
+	dbsrc := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=5432 connect_timeout=5 sslmode=prefer",
+		os.Getenv("DBHOST"),
+		os.Getenv("DBUSER"),
+		os.Getenv("DBPASS"),
+		os.Getenv("DBNAME"),
+	)
+	db, err = sqlx.Open("postgres", dbsrc)
 	if err != nil {
 		log.Fatal(err)
 	}
-	db = sql.OpenDB(c)
 	defer db.Close()
 
 	err = db.Ping()
