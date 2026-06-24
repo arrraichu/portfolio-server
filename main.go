@@ -68,8 +68,12 @@ func postContent(ctx *gin.Context) {
 	}
 
 	switch input.Type {
+	case "title":
+		err = contentDb.PostTitle(db, input)
 	case "text":
 		err = contentDb.PostTextContent(db, input)
+	case "text_buttons":
+		err = contentDb.PostTextButtonsContent(db, input)
 	default:
 		err = fmt.Errorf("Unknown content type: %s", input.Type)
 	}
