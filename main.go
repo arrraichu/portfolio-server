@@ -70,6 +70,8 @@ func postContent(ctx *gin.Context) {
 	switch input.Type {
 	case "title":
 		err = contentDb.PostTitle(db, input)
+	case "disclaimer":
+		err = contentDb.PostDisclaimer(db, input)
 	case "text":
 		err = contentDb.PostTextContent(db, input)
 	case "text_buttons":
@@ -79,6 +81,7 @@ func postContent(ctx *gin.Context) {
 	}
 
 	if err != nil {
+		log.Printf("%v", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": err.Error()})
 		return
 	}
