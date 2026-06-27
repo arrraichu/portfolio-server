@@ -6,6 +6,17 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+func FetchAllContent(db *sqlx.DB) ([]content.Content, error) {
+	var posts []content.Content
+
+	err := db.Select(&posts, "SELECT * FROM content LIMIT 100")
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
 func FetchContent(db *sqlx.DB, path string) ([]content.Content, error) {
 	var posts []content.Content
 
