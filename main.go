@@ -35,6 +35,22 @@ func getContentTypes(ctx *gin.Context) {
 }
 
 func getAllContent(ctx *gin.Context) {
+	forceFetchAll := ctx.Query("force_fetch_all")
+	if forceFetchAll == "true" {
+		posts, err := contentDb.FetchAllContent(db)
+		if err != nil {
+			log.Printf("!! ERROR !! %s\n", err.Error())
+			ctx.JSON(
+				http.StatusInternalServerError,
+				gin.H{"ok": false, "error": err.Error()},
+			)
+			return
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{"ok": true, "error": nil, "posts": posts})
+		return
+	}
+
 	path := ctx.Query("page_path")
 	if path == "" {
 		err := fmt.Errorf("Request must contain a page_path query parameter.")
