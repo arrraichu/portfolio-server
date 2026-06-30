@@ -108,6 +108,26 @@ func postContent(ctx *gin.Context) {
 	)
 }
 
+func putContent(ctx *gin.Context) {
+	var input content.Content
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		log.Printf("%v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": err.Error()})
+		return
+	}
+
+	if err := contentDb.UpdateContent(db, input); err != nil {
+		log.Printf("%v", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"ok": false, "error": err.Error()})
+		return
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		gin.H{"ok": true, "error": nil},
+	)
+}
+
 func main() {
 	var err error
 
@@ -134,6 +154,7 @@ func main() {
 	router.GET("/types", getContentTypes)
 	router.GET("/content", getAllContent)
 	router.POST("/content", postContent)
+	router.PUT("/content", putContent)
 
 	log.Println("Server listening on port 8080!")
 	log.Fatal(router.Run(":8080"))
