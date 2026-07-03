@@ -1,0 +1,8 @@
+ALTER TABLE content ADD COLUMN IF NOT EXISTS image1placement VARCHAR(64);
+ALTER TABLE content ADD COLUMN IF NOT EXISTS image2placement VARCHAR(64);
+ALTER TABLE content ADD COLUMN IF NOT EXISTS image3placement VARCHAR(64);
+ALTER TABLE content ADD COLUMN IF NOT EXISTS image4placement VARCHAR(64);
+
+INSERT INTO content_type (code, label, reqs) VALUES
+  ('image', 'image', 'image1src,image1alt,image1placement')
+ON CONFLICT DO NOTHING;

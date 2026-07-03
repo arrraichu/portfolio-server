@@ -60,3 +60,16 @@ func PostTextButtonsContent(db *sqlx.DB, input content.Content) error {
 
 	return nil
 }
+
+func PostImage(db *sqlx.DB, input content.Content) error {
+	_, err := db.Exec(
+		"INSERT INTO content (type, page_path, index, image1src, image1alt, image1placement) VALUES ($1, $2, $3, $4, $5, $6)",
+		input.Type, input.PagePath, input.Index,
+		input.ImageSrc1, input.ImageAlt1, input.ImagePlacement1,
+	)
+	if err != nil {
+		return fmt.Errorf("PostImage: %v\n", err)
+	}
+
+	return nil
+}

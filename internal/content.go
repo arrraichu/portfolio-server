@@ -28,12 +28,16 @@ type Content struct {
 	ButtonText4 *string `json:"button4text,omitempty"  db:"button4text"`
 	ButtonHref4 *string `json:"button4href,omitempty"  db:"button4href"`
 
-	ImageSrc1 *string `json:"image1src,omitempty"  db:"image1src"`
-	ImageAlt1 *string `json:"image1alt,omitempty"  db:"image1alt"`
-	ImageSrc2 *string `json:"image2src,omitempty"  db:"image2src"`
-	ImageAlt2 *string `json:"image2alt,omitempty"  db:"image2alt"`
-	ImageSrc3 *string `json:"image3src,omitempty"  db:"image3src"`
-	ImageAlt3 *string `json:"image3alt,omitempty"  db:"image3alt"`
-	ImageSrc4 *string `json:"image4src,omitempty"  db:"image4src"`
-	ImageAlt4 *string `json:"image4alt,omitempty"  db:"image4alt"`
+	ImageSrc1       *string `json:"image1src,omitempty"  db:"image1src"`
+	ImageAlt1       *string `json:"image1alt,omitempty"  db:"image1alt"`
+	ImagePlacement1 *string `json:"image1placement,omitempty" db:"image1placement"`
+	ImageSrc2       *string `json:"image2src,omitempty"  db:"image2src"`
+	ImageAlt2       *string `json:"image2alt,omitempty"  db:"image2alt"`
+	ImagePlacement2 *string `json:"image2placement,omitempty" db:"image2placement"`
+	ImageSrc3       *string `json:"image3src,omitempty"  db:"image3src"`
+	ImageAlt3       *string `json:"image3alt,omitempty"  db:"image3alt"`
+	ImagePlacement3 *string `json:"image3placement,omitempty" db:"image3placement"`
+	ImageSrc4       *string `json:"image4src,omitempty"  db:"image4src"`
+	ImageAlt4       *string `json:"image4alt,omitempty"  db:"image4alt"`
+	ImagePlacement4 *string `json:"image4placement,omitempty" db:"image4placement"`
 }
