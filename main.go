@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	contentDb "arrraichu/portfolio-server/db"
 	content "arrraichu/portfolio-server/internal"
@@ -130,6 +131,32 @@ func putContent(ctx *gin.Context) {
 	)
 }
 
+func deleteContent(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	if _, err := strconv.Atoi(id); err != nil {
+		ctx.JSON(
+			http.StatusBadRequest,
+			gin.H{"ok": false, "error": "invalid ID"},
+		)
+		return
+	}
+
+	if err := contentDb.DeleteContent(db, id); err != nil {
+		log.Printf("%v", err)
+		ctx.JSON(
+			http.StatusBadRequest,
+			gin.H{"ok": false, "error": err.Error()},
+		)
+		return
+	}
+
+	ctx.JSON(
+		http.StatusOK,
+		gin.H{"ok": true, "error": nil},
+	)
+}
+
 func main() {
 	var err error
 
@@ -157,6 +184,7 @@ func main() {
 	router.GET("/content", getAllContent)
 	router.POST("/content", postContent)
 	router.PUT("/content", putContent)
+	router.DELETE("/content/:id", deleteContent)
 
 	log.Println("Server listening on port 8080!")
 	log.Fatal(router.Run(":8080"))
