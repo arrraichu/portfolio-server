@@ -95,6 +95,8 @@ func postContent(ctx *gin.Context) {
 		err = contentDb.PostTextButtonsContent(db, input)
 	case "image":
 		err = contentDb.PostImage(db, input)
+	case "footer":
+		err = contentDb.PostFooter(db, input)
 	default:
 		err = fmt.Errorf("Unknown content type: %s", input.Type)
 	}
