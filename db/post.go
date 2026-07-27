@@ -73,3 +73,15 @@ func PostImage(db *sqlx.DB, input content.Content) error {
 
 	return nil
 }
+
+func PostFooter(db *sqlx.DB, input content.Content) error {
+	_, err := db.Exec(
+		"INSERT INTO content (type, page_path, index) VALUES ($1, $2, $3)",
+		input.Type, input.PagePath, input.Index,
+	)
+	if err != nil {
+		return fmt.Errorf("PostFooter: %v\n", err)
+	}
+
+	return nil
+}

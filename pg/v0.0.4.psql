@@ -1,0 +1,3 @@
+INSERT INTO content_type (code, label, reqs) VALUES
+  ('footer', 'footer', '')
+ON CONFLICT DO NOTHING;
